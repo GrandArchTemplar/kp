@@ -18,6 +18,14 @@ It's KGCN which based on watched film neighbours relations
 3. THE-CHOSEN-ONE-ML-RESEARCHER: @anpolol
 4. GOD-OF-UNLIMITED-DATAFLOW-WORKS: @grandarchtemplar
 
+## Installation manual:
+
+1. install docker and docker-compose on your system
+2. execute  
+`docker network create --bridge kp-eco`
+3. execute 
+`docker-compose up -d --build`
+
 ## Posts
 
 P. S. ratings could be downloaded from movielens
