@@ -1,0 +1,21 @@
+spring:
+  profiles:
+    active: dev
+---
+spring:
+  profiles: dev
+server:
+  port: 8953
+  servlet:
+    context-path: /kp
+
+kp:
+  services:
+    dataServiceUrl: ${DS_URL}
+    reasonerServiceUrl: ${REASONER_URL}
+    extractorServiceUrl: ${EXTRACTOR_URL}
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG

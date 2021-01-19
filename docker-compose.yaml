@@ -1,0 +1,45 @@
+version: '3'
+services:
+  neo4j:
+    image: neo4j:latest
+    restart: unless-stopped
+    ports:
+      - 7474:7474
+      - 7687:7687
+ #   volumes:
+  #    - ./neo4j/conf:/conf
+    environment:
+      - NEO4J_AUTH=none
+
+  extractor:
+    build: ./extractor
+    ports:
+      - 8956:8956
+
+  dataservice:
+    build: ./dataService
+    ports:
+      - 8954:8954
+    environment:
+      - NEO4J_URL=bolt://neo4j:7687
+      - JAVA_OPTS=-Xmx4g
+      - EXTRACTOR_URL=http://extractor:8956
+
+  reasoner:
+    build: ./reasoner
+    ports:
+      - 8955:8955
+
+  gateway:
+    build: ./APIGateway
+    ports:
+      - 8953:8953
+    environment:
+      - DS_URL=http://dataservice:8954
+      - REASONER_URL=http://reasoner:8955
+      - EXTRACTOR_URL=http://extractor:8956
+
+networks:
+  default:
+    external:
+      name: kp_eco

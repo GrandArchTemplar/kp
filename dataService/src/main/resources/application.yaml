@@ -1,0 +1,21 @@
+spring:
+  profiles:
+    active: dev
+---
+spring:
+  profiles: dev
+server:
+  port: 8954
+  servlet:
+    context-path: /dataservice
+
+kp:
+  neo4j:
+    url: ${NEO4j_URL}
+  extractor:
+    url: ${EXTRACTOR_URL}
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG

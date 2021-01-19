@@ -1,0 +1,16 @@
+spring:
+  profiles:
+    active: dev
+---
+spring:
+  profiles: dev
+server:
+  port: 8956
+  servlet:
+    context-path: /extractor
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
