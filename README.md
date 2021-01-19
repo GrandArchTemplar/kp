@@ -1,11 +1,15 @@
-# kp
-kursovoj project
+# kp 1.3.3.7
+kursovoj project/kinopoisk
 
 It's super cool movie recommendation system which made by the best team ever I seen
 
+## Disclaimer
+
+This readme.md completed only by me, so there are no guilty for other team members! 
+
 ## Main method
 
-It's KGCN which optimize loss function based on watched film neighbours relations 
+It's KGCN which based on watched film neighbours relations 
 
 ## StarTeam
 
@@ -16,5 +20,6 @@ It's KGCN which optimize loss function based on watched film neighbours relation
 
 ## Posts
 
-P. S. ratings could be downloaded from movielens 
+P. S. ratings could be downloaded from movielens
+
 P. P. S. we used 20m-movielens ratings file
