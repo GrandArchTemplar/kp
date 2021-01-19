@@ -39,6 +39,11 @@ services:
       - REASONER_URL=http://reasoner:8955
       - EXTRACTOR_URL=http://extractor:8956
 
+  presenter:
+    build: ./presenter
+    ports:
+      - 28080:28080
+
 networks:
   default:
     external:

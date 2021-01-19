@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Kinosait SD</title>
+    <style type="text/css">
+        .highcharts-figure, .highcharts-data-table table {
+            min-width: 320px;
+            max-width: 800px;
+            margin: 1em auto;
+        }
+
+        .highcharts-data-table table {
+            font-family: Verdana, sans-serif;
+            border-collapse: collapse;
+            border: 1px solid #EBEBEB;
+            margin: 10px auto;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+        .highcharts-data-table caption {
+            padding: 1em 0;
+            font-size: 1.2em;
+            color: #555;
+        }
+        .highcharts-data-table th {
+            font-weight: 600;
+            padding: 0.5em;
+        }
+        .highcharts-data-table td, .highcharts-data-table th, .highcharts-data-table caption {
+            padding: 0.5em;
+        }
+        .highcharts-data-table thead tr, .highcharts-data-table tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+        .highcharts-data-table tr:hover {
+            background: #f1f7ff;
+        }
+
+    </style>
+    <link rel="stylesheet" type="text/css" href="./jquery.dropdown.css">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/boost.js"></script>
+    <script src="https://code.highcharts.com/modules/networkgraph.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="jquery.js"></script>
+    <script src="jquery.csv.js"></script>
+    <script type="text/javascript" src="./mock.js"></script>
+    <script src="jquery.dropdown.js"></script>
+    <script src="jquery.csv.js"></script>
+</head>
+
+<body>
+
+<table style="width: 100%">
+    <tr>
+        <td style="width: 80%">
+            <div class="dropdownmenu">
+                <select style="display:none" multiple placeholder="Select"></select>
+            </div>
+        </td>
+        <td>
+            <button name="submit" onclick="submit()">Submit</button>
+        </td>
+    </tr>
+</table>
+
+<figure class="highcharts-figure">
+    <div id="container"></div>
+</figure>
+
+<p id = "ans"></p>
+
+<script type="text/javascript">
+
+    init()
+
+    async function init() {
+        $("[name='submit']").prop("disabled", true);
+        let films = await getFilms();
+        let dropdowndata = convertVertices(films).map(
+            function (value) {
+                return {
+                    name: value[1],
+                    id: value[0],
+                    "disabled": false,
+                    groupName: 'All films',
+                    "groupId": 1,
+                    "selected": false
+                }
+            }
+        );
+
+        let dropdownmenu = $('.dropdownmenu').dropdown({
+            data: dropdowndata,
+            input: '<input type="text" maxLength="20" placeholder="Search">'
+        });
+
+        $("[name='submit']").prop("disabled", false);
+    }
+
+    function makeGraph(json_data){
+
+        let v = json_data.vertices.replaceAll("\'", "").replaceAll("\"", "");
+        let vertices_data = convertVertices(v);
+        let edges_data = convertEdges(json_data.edges, vertices_data);
+        let rec = json_data.recommended.map(v => getVerticeById(vertices_data, v));
+        console.log(rec)
+        console.log(edges_data)
+        let XDgraph = edges_data.filter(
+            function(value){
+                return rec.includes(value[0]) || rec.includes(value[1]);
+            }
+        )
+        console.log(XDgraph)
+
+        Highcharts.chart('container', {
+            chart: {
+                type: 'networkgraph',
+                height: '100%'
+            },
+            title: {
+                text: 'Кино'
+            },
+            plotOptions: {
+                turboThreshold: 0,
+                networkgraph: {
+                    keys: ['from', 'to'],
+                    layoutAlgorithm: {
+                        enableSimulation: false,
+                        friction: -0.9
+                    }
+                }
+            },
+            series: [{
+                dataLabels: {
+                    enabled: true,
+                    linkFormat: ''
+                },
+                id: 'lang-tree',
+                data: XDgraph
+            }]
+        });
+        document.getElementById("ans").innerHTML = "" + rec;
+        Highcharts.addEvent(
+            Highcharts.Series,
+            'afterSetOptions',
+            function (e) {
+                var colors = Highcharts.getOptions().colors, i = 0, nodes = {};
+
+                e.options.data.forEach(function (link) {
+                    if (rec.includes(link[0])) {
+                        nodes[link[0]] = {
+                            id: link[0],
+                            marker: {
+                                radius: 40
+                            },
+                            color: colors[5]
+                        };
+                    }
+                    if (rec.includes(link[1])) {
+                        nodes[link[1]] = {
+                            id: link[1],
+                            marker: {
+                                radius: 40
+                            },
+                            color: colors[5]
+                        };
+                    }
+                })
+
+                e.options.nodes = Object.keys(nodes).map(function (id) {
+                    return nodes[id];
+                });
+
+            }
+        );
+    }
+
+    function convertVertices(csvtext){
+        let temp = $.csv.toArrays(csvtext);
+        temp.shift();
+        return temp;
+    }
+
+    function getVerticeById(idnamedata, id){
+        let temp = idnamedata.filter(function(value) {return value[0] == id;});
+        let temp2 = $.csv.toArray("" + temp);
+        return temp2[1];
+    }
+
+    function convertEdges(csvtext, vertices){
+        let tempdata = $.csv.toArrays(csvtext);
+
+        let fromtoid = tempdata.map(function(value){return [value[0],value[2]]});
+        fromtoid.shift();
+
+        let fromto = fromtoid.map(
+            function(value){
+                return [getVerticeById(vertices, value[0]), getVerticeById(vertices ,value[1])]
+            }
+        )
+
+        return fromto;
+    }
+
+    async function submit(){
+        $("[name='submit']").prop("disabled", true);
+        let data = [];
+        $('.dropdownmenu option:selected').each(function(){
+            data.push(parseInt($(this).val()));
+        });
+        makeGraph(await postRecommendation(data));
+        $("[name='submit']").prop("disabled", false);
+    }
+
+    async function getFilms(){
+        let response;
+        await $.ajax({
+            type: "GET",
+            url: 'http://localhost:8953/kp/api/v1/film',
+            beforeSend: function(request) {
+                request.setRequestHeader("Access-Control-Allow-Origin", "*");
+            },
+
+        }).then(function (data) { response = data })
+        return response;
+    }
+
+    async function postRecommendation(arr){
+        let response;
+        console.log(JSON.stringify(arr))
+        console.log(arr)
+        await $.ajax({
+            type: "POST",
+            url: 'http://localhost:8953/kp/api/v1/recommendation',
+            data: JSON.stringify(arr),
+            beforeSend: function(request) {
+                request.setRequestHeader("Access-Control-Allow-Origin", "*");
+                request.setRequestHeader("Content-Type", "application/json")
+            },
+        }).then(function (data) { response = data; })
+        return response;
+    }
+
+</script>
+
+</body>
+
+</html>

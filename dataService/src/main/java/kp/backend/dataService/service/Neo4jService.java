@@ -144,7 +144,7 @@ public class Neo4jService {
     }
 
     private String getEdges() {
-        return "from,with,to\n" + kg.relations.stream().limit(20).map(x -> x.from.id + "," + x.with.representation + "," + x.to.id + "\n").reduce("",(x, y) -> x + y);
+        return "from,with,to\n" + kg.relations.stream().map(x -> x.from.id + "," + x.with.representation + "," + x.to.id + "\n").reduce("",(x, y) -> x + y);
     }
 
     private List<Integer> checkExistence(Session x, List<Integer> idList) {

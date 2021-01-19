@@ -1,0 +1,19 @@
+{
+  "name": "kino",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "jquery": "^3.5.1",
+    "jquery-csv": "^1.0.11",
+    "jquery-dropdown": "^1.0.0",
+    "mock": "^0.1.1"
+  }
+}
