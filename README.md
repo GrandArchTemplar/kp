@@ -21,10 +21,8 @@ It's KGCN which based on watched film neighbours relations
 ## Installation manual:
 
 1. install docker and docker-compose on your system
-2. execute  
-`docker network create --bridge kp-eco`
-3. execute 
-`docker-compose up -d --build`
+2. execute `docker network create --bridge kp-eco`
+3. execute `docker-compose up -d --build`
 
 ## Posts
 
